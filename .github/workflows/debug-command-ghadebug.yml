@@ -1,0 +1,37 @@
+---
+name: debug-command-ghadebug
+
+on:
+  repository_dispatch:
+    types: [ghadebug-command]
+
+jobs:
+  debug-command-ghadebug:
+    name: GHADebug Command
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create URL to the run output
+      id: vars
+      run: |
+        {
+        echo "run_url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Add reaction
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.PAT }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reactions: "+1"
+        reactions-edit-mode: replace
+
+    - name: Update comment in case of failure
+      if: failure()
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        body: |
+          > Had issues fulfilling your command, check the [logs](${{ steps.vars.outputs.run_url }})
+        reactions: confused
