@@ -24,10 +24,12 @@ jobs:
       run: echo "$PAYLOAD_CONTEXT"
 
     - name: Run analyze script
+      id: analyze
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        bash .github/analyze.sh "${{ github.event.client_payload.github.payload.issue.number }}"
+        printf "result<<EOF\n%s\nEOF\n" "$(bash .github/analyze.sh ${{ github.event.client_payload.github.payload.issue.number }})" >> "$GITHUB_OUTPUT"
+
 
     - name: Add reaction
       uses: peter-evans/create-or-update-comment@v4
@@ -44,14 +46,7 @@ jobs:
         token: ${{ secrets.PAT }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-        body: |
-          > <details>
-          > <summary>Here's a list of supported commands:</summary>
-          >
-          > Command | Description
-          > --- | ---
-          > `/help` | Post this message
-          > </details>
+        body: "${{ steps.analyze.outputs.result }}"
 
     - name: Update comment in case of failure
       if: failure()
