@@ -25,7 +25,7 @@ jobs:
 
     - name: Run analyze script
       run: |
-        bash .github/analyze.sh
+        bash .github/analyze.sh "${{ github.event.client_payload.github.payload.issue.number }}"
 
     - name: Add reaction
       uses: peter-evans/create-or-update-comment@v4
@@ -35,18 +35,19 @@ jobs:
         reactions: "+1"
         reactions-edit-mode: replace
 
-    # - name: Print help message
-    #   uses: peter-evans/create-or-update-comment@v4
-    #   with:
-    #     repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-    #     body: |
-    #       > <details>
-    #       > <summary>Here's a list of supported commands:</summary>
-    #       >
-    #       > Command | Description
-    #       > --- | ---
-    #       > `/help` | Post this message
-    #       > </details>
+    - name: Print help message
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+        body: |
+          > <details>
+          > <summary>Here's a list of supported commands:</summary>
+          >
+          > Command | Description
+          > --- | ---
+          > `/help` | Post this message
+          > </details>
 
     - name: Update comment in case of failure
       if: failure()
