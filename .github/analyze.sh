@@ -8,7 +8,7 @@ fi
 PR_NUMBER="$1"
 PR_HEAD_SHA=$(gh api -X GET "repos/cmur2/poc-debug-cmd/pulls/$PR_NUMBER" --jq '.head.sha')
 
-echo "## GHA problems for PR #$PR_NUMBER"
+echo "## GHA problems for PR #$PR_NUMBER 🔍"
 echo ""
 echo "For most recent commit $PR_HEAD_SHA:"
 echo ""
@@ -29,7 +29,7 @@ gh api -X GET "repos/cmur2/poc-debug-cmd/actions/runs?sha=$PR_HEAD_SHA" --jq '.w
       fi
       >&2 echo "Job $job_id got aborted due to problem with runner: $runner_name"
 
-      echo "* [Job $job_id](https://github.com/cmur2/poc-debug-cmd/actions/runs/$workflow_run_id/job/$job_id?pr=$PR_NUMBER) got aborted due to problems with runner \`$runner_name\`:"
+      echo "* ❌ [Job $job_id](https://github.com/cmur2/poc-debug-cmd/actions/runs/$workflow_run_id/job/$job_id?pr=$PR_NUMBER) got aborted due to problems with runner \`$runner_name\`:"
       echo "  * GitHub prematurely lost connection to the runner which can happen due to high job CPU load (try reducing load), network issues or hardware failures (try rerunning)."
       echo "  * Check [resource usage for runner \`$runner_name\`](https://dashboard.int.camunda.com/d/000000019/pods?orgId=1&var-namespace=camunda&var-pod=$runner_name&var-container=All&from=now-7d&to=now) and [Kubernetes logs for runner \`$runner_name\`](https://console.cloud.google.com/logs/query;query=resource.type%3D%22k8s_cluster%22%0Aresource.labels.project_id%3D%22ci-30-162810%22%0Aresource.labels.location%3D%22europe-west1%22%0Aresource.labels.cluster_name%3D%22camunda-ci%22%20$runner_name;duration=P7D?project=ci-30-162810)."
     fi
@@ -40,7 +40,7 @@ gh api -X GET "repos/cmur2/poc-debug-cmd/actions/runs?sha=$PR_HEAD_SHA" --jq '.w
 
       >&2 echo "Job $job_id got cancelled due to timeout."
 
-      echo "* [Job $job_id](https://github.com/cmur2/poc-debug-cmd/actions/runs/$workflow_run_id/job/$job_id?pr=$PR_NUMBER) got cancelled due to timeout:"
+      echo "* ⏱️ [Job $job_id](https://github.com/cmur2/poc-debug-cmd/actions/runs/$workflow_run_id/job/$job_id?pr=$PR_NUMBER) got cancelled due to timeout:"
       echo "  * Try rerunning if that is the first time, otherwise try speeding up the job."
       if [[ $runner_name == camunda-* ]]; then
         echo "  * Check [resource usage for runner \`$runner_name\`](https://dashboard.int.camunda.com/d/000000019/pods?orgId=1&var-namespace=camunda&var-pod=$runner_name&var-container=All&from=now-7d&to=now)."
