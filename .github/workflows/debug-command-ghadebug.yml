@@ -25,7 +25,7 @@ jobs:
 
     - name: Run analyze script
       env:
-        GH_TOKEN: ${{ secrets.PAT }}
+        GH_TOKEN: ${{ github.token }}
       run: |
         bash .github/analyze.sh "${{ github.event.client_payload.github.payload.issue.number }}"
 
