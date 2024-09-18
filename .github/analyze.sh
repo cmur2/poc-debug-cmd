@@ -8,7 +8,9 @@ fi
 PR_NUMBER="$1"
 PR_HEAD_SHA=$(gh api -X GET "repos/cmur2/poc-debug-cmd/pulls/$PR_NUMBER" --jq '.head.sha')
 
-echo "# Results for PR $PR_NUMBER"
+echo "## GHA problems for PR #$PR_NUMBER"
+echo ""
+echo "For most recent commit $PR_HEAD_SHA:"
 echo ""
 
 gh api -X GET "repos/cmur2/poc-debug-cmd/actions/runs?sha=$PR_HEAD_SHA" --jq '.workflow_runs[]' | while read -r workflow_run; do

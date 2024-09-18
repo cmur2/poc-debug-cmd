@@ -27,6 +27,8 @@ jobs:
       id: analyze
       env:
         GH_TOKEN: ${{ github.token }}
+      # stdout of the script is Markdown available in "result" output,
+      # stderr shows the progress of the script while working
       run: |
         printf "result<<EOF\n%s\nEOF\n" "$(bash .github/analyze.sh ${{ github.event.client_payload.github.payload.issue.number }})" >> "$GITHUB_OUTPUT"
 
