@@ -1,0 +1,16 @@
+---
+name: debug-command-dispatch
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  debug-command-dispatch:
+    name: Dispatch Command
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo A comment on PR $NUMBER
+        env:
+          NUMBER: ${{ github.event.issue.number }}
