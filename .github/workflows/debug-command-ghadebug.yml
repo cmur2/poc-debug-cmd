@@ -24,12 +24,15 @@ jobs:
       run: echo "$PAYLOAD_CONTEXT"
 
     - name: Run analyze script
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         bash .github/analyze.sh "${{ github.event.client_payload.github.payload.issue.number }}"
 
     - name: Add reaction
       uses: peter-evans/create-or-update-comment@v4
       with:
+        token: ${{ secrets.PAT }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
         reactions: "+1"
@@ -38,6 +41,7 @@ jobs:
     - name: Print help message
       uses: peter-evans/create-or-update-comment@v4
       with:
+        token: ${{ secrets.PAT }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         body: |
