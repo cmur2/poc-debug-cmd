@@ -18,14 +18,35 @@ jobs:
         echo "run_url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
         } >> "$GITHUB_OUTPUT"
 
+    - name: Dump the client payload context
+      env:
+        PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
+      run: echo "$PAYLOAD_CONTEXT"
+
+    - name: Run analyze script
+      run: |
+        bash .github/analyze.sh
+
     - name: Add reaction
       uses: peter-evans/create-or-update-comment@v4
       with:
-        token: ${{ secrets.PAT }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
         reactions: "+1"
         reactions-edit-mode: replace
+
+    # - name: Print help message
+    #   uses: peter-evans/create-or-update-comment@v4
+    #   with:
+    #     repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+    #     body: |
+    #       > <details>
+    #       > <summary>Here's a list of supported commands:</summary>
+    #       >
+    #       > Command | Description
+    #       > --- | ---
+    #       > `/help` | Post this message
+    #       > </details>
 
     - name: Update comment in case of failure
       if: failure()
