@@ -25,7 +25,7 @@ jobs:
           reaction-token: ${{ secrets.PAT }}
           issue-type: pull-request
           commands: |
-            ghadebug
+            ci-problems
 
       - name: Update comment in case of failure
         if: failure()
