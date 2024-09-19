@@ -1,0 +1,26 @@
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable/*
+      - release-*
+  pull_request: {}
+  merge_group: {}
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    # use bash shell by default to ensure pipefail behavior is the default
+    # see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#exit-codes-and-error-action-preference
+    shell: bash
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+    - uses: actions/checkout@v4
+    - run: sleep 300
