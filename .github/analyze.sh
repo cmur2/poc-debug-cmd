@@ -5,8 +5,10 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+set -e
+
 OWNER_NAME="cmur2"
-REPO_NAME="pod-debug-cmd"
+REPO_NAME="poc-debug-cmd"
 PR_NUMBER="$1"
 PR_HEAD_SHA=$(gh api -X GET "repos/$OWNER_NAME/$REPO_NAME/pulls/$PR_NUMBER" --jq '.head.sha')
 
