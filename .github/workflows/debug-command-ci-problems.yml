@@ -1,0 +1,59 @@
+---
+name: debug-command-ci-problems
+
+on:
+  repository_dispatch:
+    types: [ci-problems-command]
+
+jobs:
+  debug-command-ci-problems:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create URL to the run output
+      id: vars
+      run: |
+        {
+        echo "run_url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Dump the client payload context
+      env:
+        PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
+      run: echo "$PAYLOAD_CONTEXT"
+
+    - name: Run analyze script
+      id: analyze
+      env:
+        GH_TOKEN: ${{ github.token }}
+      # stdout of the script is Markdown available in "result" output,
+      # stderr shows the progress of the script while working
+      run: |
+        printf "result<<EOF\n%s\nEOF\n" "$(bash .github/analyze.sh ${{ github.event.client_payload.github.payload.issue.number }})" >> "$GITHUB_OUTPUT"
+
+
+    - name: Add reaction
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.PAT }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reactions: "+1"
+        reactions-edit-mode: replace
+
+    - name: Print help message
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.PAT }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+        body: "${{ steps.analyze.outputs.result }}"
+
+    - name: Update comment in case of failure
+      if: failure()
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        body: |
+          > Had issues fulfilling your command, check the [logs](${{ steps.vars.outputs.run_url }})
+        reactions: confused
